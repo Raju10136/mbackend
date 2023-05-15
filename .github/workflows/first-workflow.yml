@@ -1,0 +1,19 @@
+name: Deployment workflow
+on: [push]
+jobs:
+  job_one:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: 134.209.232.225
+        username: root
+        key: ${{ secrets.DIGITAL_PKEY }}
+        port: 22
+        script: |
+          whoami
+          cd /opt/backend/mbackend
+          git pull origin
+          pm2 reload all
