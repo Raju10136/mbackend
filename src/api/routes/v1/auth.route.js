@@ -4,12 +4,9 @@ const controller = require('../../controllers/auth.controller');
 const { authorize, ADMIN, LOGGED_USER } = require('../../middlewares/auth');
 //const oAuthLogin = require('../../middlewares/auth').oAuth;
 const {
-  login,
-  register,
-  oAuth,
+  login, 
   refresh,
-  sendPasswordReset,
-  passwordReset,
+  sendOtp 
 } = require('../../validations/auth.validation');
 
 const router = express.Router();
@@ -21,9 +18,9 @@ router.route('/login')
 router.route('/refresh-token')
   .post(validate(refresh),authorize(), controller.refresh);
 // send otp to email or mobile
-
+router.route('/refresh-token')
+  .post(validate(sendOtp),authorize(), controller.send_otp);
 // reset password with otp
-
 
 
 /**

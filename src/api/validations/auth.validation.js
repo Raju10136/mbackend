@@ -24,6 +24,13 @@ module.exports = {
     },
   },
 
+  sendOtp: {
+    body: {
+      username: Joi.string()      
+        .required()     
+    },
+  },
+
   // POST /v1/auth/facebook
   // POST /v1/auth/google
   oAuth: {

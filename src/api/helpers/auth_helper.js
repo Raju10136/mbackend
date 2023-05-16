@@ -3,6 +3,7 @@ const APIError = require('../errors/api-error');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const user_helper = require("./user_helper");
+const users_otp_helper = require("./users_otp_helper")
 const moment = require('moment-timezone');
 const { jwtExpirationInterval,  jwtRefreshSecret,jwtSecret} = require('../../config/vars');
 
@@ -69,6 +70,26 @@ module.exports.refresh_token=(token)=>{
             message: 'Invalid refresh Token',
         }); 
     }   
+}
+
+
+module.exports.send_otp=async(userid)=>{
+     // check in user helper
+     let user = await user_helper.get_one_userid(userid);
+     //console.log(user);
+     // compare the password 
+     if(user.ID!==undefined){
+        let otp = users_otp_helper.insert_otp(user.ID);
+        // send this otp to user through mail
+        console.log("otp = " , otp);
+       //  user.password = "";
+        return otp;
+     }else{
+         throw new APIError({
+             status: httpStatus.UNAUTHORIZED,
+             message: 'Username and Password Does Not Match',
+         });  
+     }   
 }
 
   

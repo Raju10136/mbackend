@@ -13,25 +13,24 @@ const schema = {
     resend_limit: schema_types.SCHEMA_INTEGER,
     created_time: schema_types.SCHEMA_DATETIME
 }
-// model crreation
-const Model = new DatabaseService();
+
 // table declaration
 const TABLE_COSNT = "users_otp";
 
-const generate_otp = () => {   
+const generate_otp = () => {
     // Generate an OTP secret key
     const secret = otpGenerator.generateSecret();
     // Generate an OTP code
     const otpCode = otpGenerator.generate(secret);
     //
     return {
-        secret:secret,
-        otp:otpCode
+        secret: secret,
+        otp: otpCode
     }
 }
 
-const verify_otp=(secret,otp)=>{
-   return  otpGenerator.verify({ secret, token: otp });
+const verify_otp = (secret, otp) => {
+    return otpGenerator.verify({ secret, token: otp });
 }
 
 /**
@@ -40,6 +39,8 @@ const verify_otp=(secret,otp)=>{
  * @returns 
  */
 exports.get_one_otp = async (id) => {
+    // model crreation
+    const Model = new DatabaseService();
     let row = await Model.From(TABLE_COSNT).Where("users_ID=?").OrderBy("created_time DESC").One().getDataFull([id]);
     if (row !== undefined) {
         return row;
@@ -57,13 +58,15 @@ exports.get_one_otp = async (id) => {
  * @param data 
  * @returns 
  */
-exports.insert_otp = async (columns, data) => {
+exports.insert_otp = async (id) => {
     let columns = ["users_ID", "otp", "created_time"];
     let otp_data = generate_otp();
     let data = {
         users_ID: id,
         otp: otp_data.secret,
     };
+    // model crreation
+    const Model = new DatabaseService();
     await Model.Table(TABLE_COSNT).Columns(columns).insert(data);
     return otp_data.otp;
 }
