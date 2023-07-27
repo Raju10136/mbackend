@@ -83,8 +83,15 @@ module.exports = class DatabaseService {
      * @param {*} sql 
      * @returns 
      */
-    select_query = async(sql) => {
-        return await this.executeQuery(sql);    
+    select_query = (sql) => {
+        return new Promise((resolve, reject) => {
+            sqllitedb.select(sql, function (error, data) {
+                if (error) {
+                    reject(error);
+                }
+                resolve(data);
+            })
+        });
     }
     //
     get_value=(col_name,data)=>{
@@ -133,9 +140,19 @@ module.exports = class DatabaseService {
         return sql;
     }
 
-    insert = async(data) => {
-        let insert_query = this.prepareInsertQuery(data);
-        return await this.executeQuery(query.sql,query.data);      
+    insert = (data) => {
+        return new Promise((resolve, reject) => {
+            let insert_query = this.prepareInsertQuery(data);
+            console.log(insert_query);
+            sqllitedb.run(insert_query, function(err) {
+                if(null == err){
+                    data["id"] = this.lastID;
+                    resolve(data);
+                } else {
+                    reject(err)
+                }
+            });           
+        });
     }
 
     prepareUpdateQuery=(data,id,id_column)=>{
@@ -166,27 +183,47 @@ module.exports = class DatabaseService {
      * @param {*} id 
      * @param {*} id_column 
      */
-    update = async(data, id, id_column = "ID") => {
+    update = (data, id, id_column = "ID") => {
+        return new Promise((resolve, reject) => {
         let query = this.prepareUpdateQuery(data,id,id_column);
-        return await this.executeQuery(query.sql,query.data);
+        sqllitedb.run(query.sql,query.data,function(err) {
+            if(null == err){   
+                data["id"] = id;            
+                resolve(data);
+            } else {
+                reject(err)
+            }
+        }); 
+       });
     }
     /**
      * 
      * @param {*} id 
      * @param {*} id_column 
      */
-    delete=async(id,id_column="ID")=>{
+    delete=(id,id_column="ID")=>{
         let sql = "DELETE FROM " + this.table_name +" WHERE "+id_column+"=(?)";
-        return await this.executeQuery(sql, [id]);
+        sqllitedb.run(sql, id, function(err) {
+            if(null == err){                       
+                resolve(true);
+            } else {
+                reject(err)
+            }
+        });
     }
     /**
      * 
      * @param {*} data 
      */
-    deleteQuery=async(data)=>{
+    deleteQuery=(data)=>{
         let sql = "DELETE FROM " + this.table_name +" WHERE "+this.where_sql+"";
-        return await this.executeQuery(sql, data);
-       
+        sqllitedb.run(sql, data, function(err) {
+            if(null == err){                       
+                resolve(true);
+            } else {
+                reject(err)
+            }
+        });
     }  
 
     prepareSqlQuery=()=>{
@@ -214,7 +251,32 @@ module.exports = class DatabaseService {
             return data_out[0] !==undefined ? data_out[0] : {};
        }else{
             return await this.executeQuery(sql_param,params);
-       }       
+       }
+        /*
+        return new Promise(async(resolve, reject) => {
+            let sql_param = this.prepareSqlQuery();
+           // console.log("sql = ", sql_param, "params=",params);
+            // only one row
+            if (this.limit_flag === 1) {
+                /*
+                sqllitedb.get(sql_param,params,(error, row) => {
+                    if(error){
+                        reject(error);
+                    }
+                    resolve(row);
+                });                
+            }else{
+                return await this.executeQuery(sql_param,params);
+                /*
+                sqllitedb.all(sql_param,params,(error, rows) => {
+                    if(error){
+                        reject(error);
+                    }
+                    resolve(rows);
+                });
+
+            }          
+        });*/
     }
 
     executeQuery=async(query, values = []) =>{
@@ -224,11 +286,7 @@ module.exports = class DatabaseService {
           const result = await conn.query(query, values);
           return result;
         } catch (err) {
-            throw new APIError({
-                status: httpStatus['500_MESSAGE'],
-                message: err,
-            });
-        //  throw err;
+          throw err;
         } finally {
           if (conn) conn.release();
         }

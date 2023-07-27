@@ -29,7 +29,7 @@ const schema = {
 }
 
 // table declaration
-const TABLE = "users";
+const TABLE = "sd_mt_userdb";
 // hash the password
 const hash_password = async (pass_sting) => {
     const salt = await bcrypt.genSalt(10);

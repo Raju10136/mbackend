@@ -85,7 +85,13 @@ exports.reset_password_admin = async (req, res, next) => {
     return next(error);
   }
 };
-
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 exports.getAll = async (req, res, next) => {
   try {
     let rows = await user_helper.get_all();
@@ -94,7 +100,13 @@ exports.getAll = async (req, res, next) => {
     return next(error);
   }
 };
-
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 exports.getOne = async (req, res, next) => {
   try {
     let id = req.params.id !== undefined ? parseInt(req.params.id) : 0;

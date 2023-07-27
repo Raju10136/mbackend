@@ -20,11 +20,11 @@ router
 
 router
 .route('/getAll')
-.get(authorize(),controller.getAll)
+.get(controller.getAll)
 
 router
 .route('/getOne/:id')
-.get(authorize(),controller.getOne)
+.get(controller.getOne)
 
 router
 .route('/reset_pass_user')

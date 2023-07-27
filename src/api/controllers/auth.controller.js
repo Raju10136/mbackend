@@ -1,7 +1,13 @@
 const httpStatus = require('http-status');
 const auth_helper = require("../helpers/auth_helper");
 const users_otp_helper = require("../helpers/users_otp_helper");
-
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 exports.login = async (req, res, next) => {
   try {       
     let username = req.body.username;
@@ -12,7 +18,13 @@ exports.login = async (req, res, next) => {
     return next(error);
   }
 };
-
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 exports.refresh = async (req, res, next) => {
   try {
     const {refreshToken } = req.body;   
@@ -22,7 +34,13 @@ exports.refresh = async (req, res, next) => {
     return next(error);
   }
 };
-
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @returns 
+ */
 exports.send_otp= async (req, res, next) => {
   try {
     const {username } = req.body;   
